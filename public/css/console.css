@@ -1,0 +1,38 @@
+.shell {
+  padding: 15px;
+  border: 1px solid #eeeeee;
+  background-color: #fefefe;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+  border-radius: 10px;
+
+  line-height: 20px;
+  font-size: 12px;
+  font-family: Menlo, "monospace";
+  color: #666;
+}
+
+.shell>pre>span, .shell>form>input {
+  font-weight: bold;
+  color: #333333;
+  margin-left: 2px;
+  font-family: Menlo, "monospace";
+  font-size: 12px;
+}
+
+.shell>pre.resp { 
+  margin: 0px;
+}
+
+.shell>pre.error {
+  color: #c11;
+  margin: 0px;
+}
+
+.shell input, .shell textarea {
+  width: 900px;
+  outline: none;
+  border: 0;
+}
