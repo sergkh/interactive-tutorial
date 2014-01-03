@@ -31,19 +31,56 @@
     });
 
     $input.on('keydown', function(evt) {
+      // submit form on Ctrl+Enter, especially usdefull for textarea
       if (evt.ctrlKey && evt.keyCode == 13) {
         $form.submit(); 
-      }
+        return ;
+      } 
+    }).on('keyup', function(evt) {
+      Console.performAutocompletion($input, options);
     });
+
+
  	}
 
   Console.defaults = {
     input : '<input type="text" autocomplete="off" name="cmd" spellcheck="false"></input>', 
     prompt: '&gt;',
-
+    dictionary: ['SELECT', 'WHERE', 'INSERT', 'OR', 'AND', 'SORT BY', 'BETWEEN'],    
+    typeaheadEnabled: true,
+    autocompletionEnabled: true,
+    autocompletionThreshold: 3,
     processor: function(out, cmd) {
       out.error('Unknown command: <b>' + cmd + '</b>');
+    },
+
+    autocomplete: function(text, lastWord, options) {
+      var result = [];
+      var words = options.dictionary;
+
+      // simple dictionary based autocompletion
+      for(var idx = 0; idx < words.length; idx++) {
+        if(words[idx].indexOf(lastWord) == 0) result.push(words[idx]);  
+      }
+
+      return result;
     }
+  }
+
+  Console.performAutocompletion = function (input, opts) {
+    if (!opts.typeaheadEnabled && !opts.autocompletionEnabled) return ;
+
+    var text = input.val().trim();
+    var lastWord = /[^\s,.\(\)\+\-\*\\]*$/.exec(text);
+
+    if(lastWord == null || lastWord[0].length < opts.autocompletionThreshold) return ;
+
+    var completions = opts.autocomplete(text, lastWord[0], opts);
+
+    // typeahead
+    if(options.typeaheadEnabled) {
+
+    }  
   }
 
   var old = $.fn.console;

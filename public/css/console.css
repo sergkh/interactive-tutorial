@@ -22,13 +22,12 @@
   font-size: 12px;
 }
 
-.shell>pre.resp { 
+.shell>pre { 
   margin: 0px;
 }
 
 .shell>pre.error {
   color: #c11;
-  margin: 0px;
 }
 
 .shell input, .shell textarea {
