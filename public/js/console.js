@@ -1,9 +1,9 @@
 !function ($) { 'use strict'; // jshint ;_;
 
  	var Console = function (element, options) {
- 		var self = this;
+    var self = this;
 
- 		this.$el = $(element);
+    this.$el = $(element);
 
     var content = $('<form><span>' + options.prompt + '</span>' + options.input + '</form>');
 
@@ -35,9 +35,25 @@
       if (evt.ctrlKey && evt.keyCode == 13) {
         $form.submit(); 
         return ;
-      } 
+      }
+
+      // use tab 
+      if(evt.keyCode === 9) { 
+        var field = $input[0];
+
+        if(options.typeaheadEnabled && 
+          field.selectionStart && 
+          field.selectionStart != field.selectionEnd) {
+          field.selectionStart = field.selectionEnd;
+          Console.insertAtCaret(field, ' ');
+          field.selectionStart = field.selectionEnd;
+          evt.preventDefault();
+        }
+      }
     }).on('keyup', function(evt) {
-      Console.performAutocompletion($input, options);
+      if(evt.keyCode > 47 && evt.keyCode < 112) {
+        Console.performAutocompletion($input, options);
+      }
     });
 
 
@@ -71,16 +87,41 @@
     if (!opts.typeaheadEnabled && !opts.autocompletionEnabled) return ;
 
     var text = input.val().trim();
-    var lastWord = /[^\s,.\(\)\+\-\*\\]*$/.exec(text);
 
-    if(lastWord == null || lastWord[0].length < opts.autocompletionThreshold) return ;
+    var lastWordMatch = /[^\s,.\(\)\+\-\*\\]*$/.exec(text);
+    if(lastWordMatch == null || lastWordMatch[0].length < opts.autocompletionThreshold) return ;
+    var lastWord = lastWordMatch[0];
 
-    var completions = opts.autocomplete(text, lastWord[0], opts);
+    var completions = opts.autocomplete(text, lastWord, opts);
+
+    if(completions.length == 0) return ;
 
     // typeahead
-    if(options.typeaheadEnabled) {
-
+    if(opts.typeaheadEnabled) {
+      Console.insertAtCaret(input[0], completions[0].substring(lastWord.length));
     }  
+  }
+
+  Console.insertAtCaret = function(field, text) {
+    if (document.selection) {
+        // IE
+        field.focus();
+        var sel = document.selection.createRange();
+        sel.text = text;
+        field.focus();
+    } else if (field.selectionStart || field.selectionStart === 0) {
+        var startPos = field.selectionStart;
+        var endPos = field.selectionEnd;
+        var scrollTop = field.scrollTop;
+        field.value = field.value.substring(0, startPos) + text + field.value.substring(endPos, field.value.length);
+        field.focus();
+        field.selectionStart = startPos;
+        field.selectionEnd = startPos + text.length;
+        field.scrollTop = scrollTop;
+    } else {
+        field.value += text;
+        field.focus();
+    }
   }
 
   var old = $.fn.console;
